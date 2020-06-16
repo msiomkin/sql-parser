@@ -14,7 +14,7 @@ In March 2015 we've also written a short paper outlining discussing some develop
 **Note:** You can also find a detailed usage description at this [blog post](http://torpedro.github.io/tech/c++/sql/parser/2016/02/27/c++-sql-parser.html).
 
 **Requirements:**
- * gcc 4.8+ (or clang 3.4+)
+ * gcc 5+ (or clang 5+)
 
 To use the SQL parser in your own projects you simply have to follow these few steps. The only requirement for is gcc 4.8+. Older versions of gcc/clang might also work, but are untested.
 
@@ -40,8 +40,8 @@ To use the SQL parser in your own projects you simply have to follow these few s
     if (result.isValid() && result.size() > 0) {
         const hsql::SQLStatement* statement = result.getStatement(0);
 
-        if (statement.isType(hsql::SelectStatement)) {
-            const hsql::SelectStatement* select = (const hsql::SelectStatement*) statement;
+        if (statement->isType(hsql::kStmtSelect)) {
+            const auto* select = static_cast<const hsql::SelectStatement*>(statement);
             /* ... */
         }
     }
