@@ -211,6 +211,47 @@ TEST(SelectBetweenTest) {
   ASSERT_STREQ(where->exprList->at(1)->getName(), "c");
 }
 
+TEST(SelectNotBetweenTest) {
+  TEST_PARSE_SQL_QUERY(
+      "SELECT grade, city FROM students WHERE grade NOT BETWEEN 1 and c;"
+      "SELECT grade, city FROM students WHERE NOT (grade BETWEEN 1 and c);",
+    result, 2);
+
+  auto stmt = (SelectStatement*)result.getStatement(0);
+  Expr* where = stmt->whereClause;
+
+  ASSERT_NOTNULL(where);
+  ASSERT(where->isType(kExprOperator));
+  ASSERT_EQ(where->opType, kOpNot);
+  ASSERT_EQ(where->expr->opType, kOpBetween);
+
+  ASSERT_STREQ(where->expr->expr->getName(), "grade");
+  ASSERT(where->expr->expr->isType(kExprColumnRef));
+
+  ASSERT_EQ(where->expr->exprList->size(), 2);
+  ASSERT(where->expr->exprList->at(0)->isType(kExprLiteralInt));
+  ASSERT_EQ(where->expr->exprList->at(0)->ival, 1);
+  ASSERT(where->expr->exprList->at(1)->isType(kExprColumnRef));
+  ASSERT_STREQ(where->expr->exprList->at(1)->getName(), "c");
+
+  stmt = (SelectStatement*)result.getStatement(1);
+  where = stmt->whereClause;
+
+  ASSERT_NOTNULL(where);
+  ASSERT(where->isType(kExprOperator));
+  ASSERT_EQ(where->opType, kOpNot);
+  ASSERT_EQ(where->expr->opType, kOpBetween);
+
+  ASSERT_STREQ(where->expr->expr->getName(), "grade");
+  ASSERT(where->expr->expr->isType(kExprColumnRef));
+
+  ASSERT_EQ(where->expr->exprList->size(), 2);
+  ASSERT(where->expr->exprList->at(0)->isType(kExprLiteralInt));
+  ASSERT_EQ(where->expr->exprList->at(0)->ival, 1);
+  ASSERT(where->expr->exprList->at(1)->isType(kExprColumnRef));
+  ASSERT_STREQ(where->expr->exprList->at(1)->getName(), "c");
+}
+
 TEST(SelectConditionalSelectTest) {
   TEST_PARSE_SINGLE_SQL(
       "SELECT * FROM t WHERE a = (SELECT MIN(v) FROM tt) AND EXISTS (SELECT * FROM test WHERE x < a);", kStmtSelect,

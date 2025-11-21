@@ -1246,7 +1246,8 @@ array_expr : ARRAY '[' expr_list ']' { $$ = Expr::makeArray($3); };
 
 array_index : operand '[' int_literal ']' { $$ = Expr::makeArrayIndex($1, $3->ival); };
 
-between_expr : operand BETWEEN operand AND operand { $$ = Expr::makeBetween($1, $3, $5); };
+between_expr : operand BETWEEN operand AND operand { $$ = Expr::makeBetween($1, $3, $5); }
+| operand NOT BETWEEN operand AND operand { $$ = Expr::makeOpUnary(kOpNot, Expr::makeBetween($1, $4, $6)); };
 
 column_name : IDENTIFIER { $$ = Expr::makeColumnRef($1); }
 | IDENTIFIER '.' IDENTIFIER { $$ = Expr::makeColumnRef($1, $3); }
