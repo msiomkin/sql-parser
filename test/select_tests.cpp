@@ -1390,4 +1390,55 @@ TEST(IntervalToIntervalTypes) {
   ASSERT_STREQ(stmt->selectList->at(6)->expr->name, "5:30.123");
 }
 
+TEST(SelectFromTableFunctionTest) {
+  TEST_PARSE_SQL_QUERY(
+      "SELECT * FROM generate_series(1, 10);"
+      "SELECT * FROM sys.generate_series(1, 10);"
+      "SELECT * FROM my_table_fn();"
+      "SELECT * FROM public.my_table_fn();",
+    result, 4);
+
+  auto stmt = (SelectStatement*)result.getStatement(0);
+  TableRef* table = stmt->fromTable;
+  ASSERT_NOTNULL(table);
+  ASSERT_EQ(table->type, kTableFunction);
+  ASSERT_STREQ(table->name, "generate_series");
+  ASSERT_NOTNULL(table->exprList);
+  ASSERT_EQ(table->exprList->size(), 2);
+  ASSERT(table->exprList->at(0)->isType(kExprLiteralInt));
+  ASSERT_EQ(table->exprList->at(0)->ival, 1);
+  ASSERT(table->exprList->at(1)->isType(kExprLiteralInt));
+  ASSERT_EQ(table->exprList->at(1)->ival, 10);
+
+  stmt = (SelectStatement*)result.getStatement(1);
+  table = stmt->fromTable;
+  ASSERT_NOTNULL(table);
+  ASSERT_EQ(table->type, kTableFunction);
+  ASSERT_STREQ(table->schema, "sys");
+  ASSERT_STREQ(table->name, "generate_series");
+  ASSERT_NOTNULL(table->exprList);
+  ASSERT_EQ(table->exprList->size(), 2);
+  ASSERT(table->exprList->at(0)->isType(kExprLiteralInt));
+  ASSERT_EQ(table->exprList->at(0)->ival, 1);
+  ASSERT(table->exprList->at(1)->isType(kExprLiteralInt));
+  ASSERT_EQ(table->exprList->at(1)->ival, 10);
+
+  stmt = (SelectStatement*)result.getStatement(2);
+  table = stmt->fromTable;
+  ASSERT_NOTNULL(table);
+  ASSERT_EQ(table->type, kTableFunction);
+  ASSERT_STREQ(table->name, "my_table_fn");
+  ASSERT_NOTNULL(table->exprList);
+  ASSERT_EQ(table->exprList->size(), 0);
+
+  stmt = (SelectStatement*)result.getStatement(3);
+  table = stmt->fromTable;
+  ASSERT_NOTNULL(table);
+  ASSERT_EQ(table->type, kTableFunction);
+  ASSERT_STREQ(table->schema, "public");
+  ASSERT_STREQ(table->name, "my_table_fn");
+  ASSERT_NOTNULL(table->exprList);
+  ASSERT_EQ(table->exprList->size(), 0);
+}
+
 }  // namespace hsql

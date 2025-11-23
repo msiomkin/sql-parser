@@ -418,7 +418,7 @@ Alias::~Alias() {
 
 // TableRef
 TableRef::TableRef(TableRefType type)
-    : type(type), schema(nullptr), name(nullptr), alias(nullptr), select(nullptr), list(nullptr), join(nullptr) {}
+    : type(type), schema(nullptr), name(nullptr), alias(nullptr), select(nullptr), list(nullptr), join(nullptr), exprList(nullptr) {}
 
 TableRef::~TableRef() {
   free(schema);
@@ -433,6 +433,13 @@ TableRef::~TableRef() {
       delete table;
     }
     delete list;
+  }
+
+  if (exprList) {
+    for (Expr* e : *exprList) {
+      delete e;
+    }
+    delete exprList;
   }
 }
 

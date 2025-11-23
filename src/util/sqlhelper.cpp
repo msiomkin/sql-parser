@@ -55,6 +55,15 @@ void printTableRefInfo(TableRef* table, uintmax_t num_indent) {
     case kTableCrossProduct:
       for (TableRef* tbl : *table->list) printTableRefInfo(tbl, num_indent);
       break;
+    case kTableFunction:
+      if (table->schema) {
+        inprint("Schema", num_indent + 1);
+        inprint(table->schema, num_indent + 2);
+      }
+      inprint(table->name, num_indent);
+      for (Expr* e : *table->exprList) {
+        printExpression(e, num_indent + 1);
+      }
   }
 
   if (table->alias) {

@@ -12,7 +12,7 @@ struct JoinDefinition;
 struct TableRef;
 
 // Possible table reference types.
-enum TableRefType { kTableName, kTableSelect, kTableJoin, kTableCrossProduct };
+enum TableRefType { kTableName, kTableSelect, kTableJoin, kTableCrossProduct, kTableFunction };
 
 struct TableName {
   char* schema;
@@ -41,6 +41,7 @@ struct TableRef {
   SelectStatement* select;
   std::vector<TableRef*>* list;
   JoinDefinition* join;
+  std::vector<Expr*>* exprList;
 
   // Returns true if a schema is set.
   bool hasSchema() const;

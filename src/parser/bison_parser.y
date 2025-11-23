@@ -1346,6 +1346,36 @@ nonjoin_table_ref_atomic : table_ref_name | '(' select_statement ')' opt_table_a
   tbl->select = $2;
   tbl->alias = $4;
   $$ = tbl;
+}
+| IDENTIFIER '(' ')' opt_table_alias {
+  auto tbl = new TableRef(kTableFunction);
+  tbl->name = $1;
+  tbl->exprList = new std::vector<Expr*>();
+  tbl->alias = $4;
+  $$ = tbl;
+}
+| IDENTIFIER '(' expr_list ')' opt_table_alias {
+  auto tbl = new TableRef(kTableFunction);
+  tbl->name = $1;
+  tbl->exprList = $3;
+  tbl->alias = $5;
+  $$ = tbl;
+}
+| IDENTIFIER '.' IDENTIFIER '(' ')' opt_table_alias {
+  auto tbl = new TableRef(kTableFunction);
+  tbl->schema = $1;
+  tbl->name = $3;
+  tbl->exprList = new std::vector<Expr*>();
+  tbl->alias = $6;
+  $$ = tbl;
+}
+| IDENTIFIER '.' IDENTIFIER '(' expr_list ')' opt_table_alias {
+  auto tbl = new TableRef(kTableFunction);
+  tbl->schema = $1;
+  tbl->name = $3;
+  tbl->exprList = $5;
+  tbl->alias = $7;
+  $$ = tbl;
 };
 
 table_ref_commalist : table_ref_atomic {
