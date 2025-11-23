@@ -55,13 +55,19 @@ std::ostream& operator<<(std::ostream& stream, const ColumnType& column_type) {
       stream << "TEXT";
       break;
     case DataType::DATETIME:
-      stream << "DATETIME";
+      stream << "TIMESTAMP";
+      break;
+    case DataType::DATETIMETZ:
+      stream << "TIMESTAMPTZ";
       break;
     case DataType::DATE:
       stream << "DATE";
       break;
     case DataType::TIME:
       stream << "TIME";
+      break;
+    case DataType::TIMETZ:
+      stream << "TIMETZ";
       break;
     case DataType::INTERVAL_YEAR:
       stream << "INTERVAL YEAR";

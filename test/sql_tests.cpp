@@ -50,7 +50,10 @@ TEST(CreateStatementTest) {
       "  c_text TEXT UNIQUE PRIMARY KEY NOT NULL, "
       "  c_time TIME, "
       "  c_time_precision TIME(17), "
+      "  c_timetz TIMETZ, "
+      "  c_timetz_precision TIMETZ(17), "
       "  c_timestamp TIMESTAMP, "
+      "  c_timestamptz TIMESTAMPTZ, "
       "  c_varchar VARCHAR(50), "
       "  c_char_varying CHARACTER VARYING(60)"
       ")",
@@ -63,7 +66,7 @@ TEST(CreateStatementTest) {
   ASSERT_EQ(stmt->type, kCreateTable);
   ASSERT_STREQ(stmt->tableName, "dummy_table");
   ASSERT_NOTNULL(stmt->columns);
-  ASSERT_EQ(stmt->columns->size(), 21);
+  ASSERT_EQ(stmt->columns->size(), 24);
   // c_bigint BIGINT
   ASSERT_STREQ(stmt->columns->at(0)->name, "c_bigint");
   ASSERT_EQ(stmt->columns->at(0)->type, (ColumnType{DataType::BIGINT}));
@@ -154,19 +157,33 @@ TEST(CreateStatementTest) {
   ASSERT_NEQ(stmt->columns->at(17)->type, (ColumnType{DataType::TIME, 0, 18}));
   ASSERT_NEQ(stmt->columns->at(17)->type, (ColumnType{DataType::TIME, 1, 17}));
   ASSERT_EQ(stmt->columns->at(17)->nullable, true);
-  // c_timestamp TIMESTAMP
-  ASSERT_STREQ(stmt->columns->at(18)->name, "c_timestamp");
-  ASSERT_EQ(stmt->columns->at(18)->type, (ColumnType{DataType::DATETIME}));
+  // c_timetz TIMETZ
+  ASSERT_STREQ(stmt->columns->at(18)->name, "c_timetz");
+  ASSERT_EQ(stmt->columns->at(18)->type, (ColumnType{DataType::TIMETZ}));
   ASSERT_EQ(stmt->columns->at(18)->nullable, true);
-  // c_varchar VARCHAR(50)
-  ASSERT_STREQ(stmt->columns->at(19)->name, "c_varchar");
-  ASSERT_EQ(stmt->columns->at(19)->type, (ColumnType{DataType::VARCHAR, 50}));
-  ASSERT_NEQ(stmt->columns->at(19)->type, (ColumnType{DataType::VARCHAR, 51}));
+  // c_timetz_precision TIME(17)
+  ASSERT_STREQ(stmt->columns->at(19)->name, "c_timetz_precision");
+  ASSERT_EQ(stmt->columns->at(19)->type, (ColumnType{DataType::TIMETZ, 0, 17}));
+  ASSERT_NEQ(stmt->columns->at(19)->type, (ColumnType{DataType::TIMETZ, 0, 18}));
+  ASSERT_NEQ(stmt->columns->at(19)->type, (ColumnType{DataType::TIMETZ, 1, 17}));
   ASSERT_EQ(stmt->columns->at(19)->nullable, true);
+  // c_timestamp TIMESTAMP
+  ASSERT_STREQ(stmt->columns->at(20)->name, "c_timestamp");
+  ASSERT_EQ(stmt->columns->at(20)->type, (ColumnType{DataType::DATETIME}));
+  ASSERT_EQ(stmt->columns->at(20)->nullable, true);
+  // c_timestamp TIMESTAMPTZ
+  ASSERT_STREQ(stmt->columns->at(21)->name, "c_timestamptz");
+  ASSERT_EQ(stmt->columns->at(21)->type, (ColumnType{DataType::DATETIMETZ}));
+  ASSERT_EQ(stmt->columns->at(21)->nullable, true);
+  // c_varchar VARCHAR(50)
+  ASSERT_STREQ(stmt->columns->at(22)->name, "c_varchar");
+  ASSERT_EQ(stmt->columns->at(22)->type, (ColumnType{DataType::VARCHAR, 50}));
+  ASSERT_NEQ(stmt->columns->at(22)->type, (ColumnType{DataType::VARCHAR, 51}));
+  ASSERT_EQ(stmt->columns->at(22)->nullable, true);
   // c_char_varying CHARACTER VARYING(60)
-  ASSERT_STREQ(stmt->columns->at(20)->name, "c_char_varying");
-  ASSERT_EQ(stmt->columns->at(20)->type, (ColumnType{DataType::VARCHAR, 60}));
-  ASSERT_NEQ(stmt->columns->at(20)->type, (ColumnType{DataType::VARCHAR, 61}));
+  ASSERT_STREQ(stmt->columns->at(23)->name, "c_char_varying");
+  ASSERT_EQ(stmt->columns->at(23)->type, (ColumnType{DataType::VARCHAR, 60}));
+  ASSERT_NEQ(stmt->columns->at(23)->type, (ColumnType{DataType::VARCHAR, 61}));
   // Table constraints are identified and separated during the parsing of the SQL string
   // Table constraints:
   // - PRIMARY KEY(c_char, c_int)
